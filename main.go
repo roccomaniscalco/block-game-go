@@ -1,8 +1,12 @@
 package main
 
 import "fmt"
-import "rsc.io/quote"
 
 func main() {
-	fmt.Print(quote.Go())
+
+	arr := [5]int{1,2,3,4,5}
+
+	for _, num := range arr {
+		fmt.Println(num)
+	}
 }
