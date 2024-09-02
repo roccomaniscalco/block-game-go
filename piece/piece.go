@@ -1,4 +1,4 @@
-package gamePiece
+package piece
 
 var shapes = map[string][][]int{
 	"1x1": {{1}},

@@ -1,4 +1,4 @@
-package gameBoard
+package board
 
 import (
 	"errors"
@@ -6,12 +6,12 @@ import (
 	"strings"
 )
 
-var gameBoard [9][9]int
+var board [9][9]int
 
 func init() {
-	for i := range gameBoard {
-		for j := range gameBoard[i] {
-			gameBoard[i][j] = 0
+	for i := range board {
+		for j := range board[i] {
+			board[i][j] = 0
 		}
 	}
 }
@@ -25,10 +25,10 @@ func PlacePattern(pattern [][]int, coords []int) error {
 
 	for i := range pattern {
 		for j := range pattern[i] {
-			if startX+i > len(gameBoard) || startY+j > len(gameBoard[i]) {
+			if startX+i > len(board) || startY+j > len(board[i]) {
 				return errors.New("pattern goes out of bounds")
 			}
-			if pattern[i][j] == 1 && gameBoard[startX+i][startY+j] == 1 {
+			if pattern[i][j] == 1 && board[startX+i][startY+j] == 1 {
 				return errors.New("pattern overlaps filled game board tiles")
 			}
 		}
@@ -36,7 +36,7 @@ func PlacePattern(pattern [][]int, coords []int) error {
 
 	for i := range pattern {
 		for j := range pattern[i] {
-			gameBoard[startX+i][startY+j] = pattern[i][j]
+			board[startX+i][startY+j] = pattern[i][j]
 		}
 	}
 
@@ -45,9 +45,9 @@ func PlacePattern(pattern [][]int, coords []int) error {
 
 func ToString() string {
 	var builder strings.Builder
-	for i := range gameBoard {
-		for j := range gameBoard[i] {
-			builder.WriteString(fmt.Sprintf("%d ", gameBoard[i][j]))
+	for i := range board {
+		for j := range board[i] {
+			builder.WriteString(fmt.Sprintf("%d ", board[i][j]))
 		}
 		builder.WriteString("\n")
 	}
