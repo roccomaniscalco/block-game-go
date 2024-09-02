@@ -1,6 +1,7 @@
 package gameBoard
 
 import (
+	"errors"
 	"strings"
 )
 
@@ -12,6 +13,33 @@ func init() {
 			gameBoard[i][j] = false
 		}
 	}
+}
+
+func PlacePattern(pattern [][]int, coords []int) error {
+	startX, startY := coords[0], coords[1]
+
+	if (startX < 1 || startY < 1) {
+		return errors.New("coords must be positive")
+	}
+
+	for i := range pattern {
+		for j := range pattern[i] {
+			if startX+i > len(gameBoard) || startY+j > len(gameBoard[i]) {
+				return errors.New("pattern goes out of bounds")
+			}
+			if pattern[i][j] == 1 && gameBoard[startX+i][startY+j] {
+				return errors.New("pattern overlaps filled game board tiles")
+			}
+		}
+	}
+
+	for i := range pattern {
+		for j := range pattern[i] {
+			gameBoard[startX+i][startY+j] = pattern[i][j] == 1
+		}
+	}
+
+	return nil
 }
 
 func ToString() string {
