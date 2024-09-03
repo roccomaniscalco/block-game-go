@@ -19,7 +19,7 @@ func init() {
 func PlacePattern(pattern [][]int, coords []int) error {
 	startX, startY := coords[0], coords[1]
 
-	if (startX < 0 || startY < 0 || startX > 8 || startY > 8) {
+	if startX < 0 || startY < 0 || startX > 8 || startY > 8 {
 		return errors.New("coords must be within range 0-8 inclusive")
 	}
 
@@ -47,18 +47,36 @@ func EvaluateRows() []int {
 	completedRows := []int{}
 
 	for rowI := range board {
-		isColumnComplete := true
+		isRowComplete := true
 		for colI := range board[rowI] {
 			if board[rowI][colI] == 0 {
-				isColumnComplete = false
+				isRowComplete = false
 			}
 		}
-		if isColumnComplete {
+		if isRowComplete {
 			completedRows = append(completedRows, rowI)
 		}
 	}
 
 	return completedRows
+}
+
+func EvaluateCols() []int {
+	completedCols := []int{}
+
+	for colI := range board[0] {
+		isColComplete := true
+		for rowI := range board {
+			if board[rowI][colI] == 0 {
+				isColComplete = false
+			}
+		}
+		if isColComplete {
+			completedCols = append(completedCols, colI)
+		}
+	}
+
+	return completedCols
 }
 
 func ToString() string {

@@ -19,8 +19,19 @@ func main() {
 	board.PlacePattern(piece.GetPattern(), []int{7, 3})
 	board.PlacePattern(piece.GetPattern(), []int{8, 3})
 
-	completedColumns := board.EvaluateRows()
-	fmt.Println(completedColumns)
+	board.PlacePattern(piece.GetPattern(), []int{4, 0})
+	board.PlacePattern(piece.GetPattern(), []int{4, 1})
+	board.PlacePattern(piece.GetPattern(), []int{4, 2})
+	board.PlacePattern(piece.GetPattern(), []int{4, 3})
+	board.PlacePattern(piece.GetPattern(), []int{4, 4})
+	board.PlacePattern(piece.GetPattern(), []int{4, 5})
+	board.PlacePattern(piece.GetPattern(), []int{4, 6})
+	board.PlacePattern(piece.GetPattern(), []int{4, 7})
+	board.PlacePattern(piece.GetPattern(), []int{4, 8})
+
+	completedRows := board.EvaluateRows()
+	completedCols := board.EvaluateCols()
+	fmt.Println(completedRows, completedCols)
 
 	err := board.PlacePattern(piece.GetPattern(), []int{2, 3})
 	if err != nil {
