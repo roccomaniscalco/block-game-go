@@ -6,17 +6,27 @@ import (
 	"strings"
 )
 
-var board [9][9]int
+var board = [9][9]int{
+	{0, 0, 0, 0, 1, 1, 1, 0, 0},
+	{0, 0, 0, 0, 1, 1, 1, 0, 0},
+	{0, 0, 0, 0, 1, 1, 1, 0, 0},
+	{0, 0, 0, 1, 0, 0, 0, 0, 0},
+	{0, 0, 0, 1, 0, 0, 0, 0, 0},
+	{0, 0, 0, 1, 0, 0, 0, 0, 0},
+	{1, 1, 1, 1, 1, 1, 1, 1, 1},
+	{0, 0, 0, 1, 0, 0, 0, 0, 0},
+	{0, 0, 0, 1, 0, 0, 0, 1, 0},
+}
 
 type Coords = [2]int
 
-func init() {
-	for rowI := range board {
-		for colI := range board[rowI] {
-			board[rowI][colI] = 0
-		}
-	}
-}
+// func init() {
+// 	for rowI := range board {
+// 		for colI := range board[rowI] {
+// 			board[rowI][colI] = 0
+// 		}
+// 	}
+// }
 
 func PlacePattern(pattern [][]int, coords Coords) error {
 	startX, startY := coords[0], coords[1]
@@ -45,65 +55,82 @@ func PlacePattern(pattern [][]int, coords Coords) error {
 	return nil
 }
 
-func EvaluateRows() []int {
-	completedRows := []int{}
+func Evaluate() {
+	cells := []Coords{}
 
-	for rowI := range board {
-		isRowComplete := true
-		for colI := range board[rowI] {
-			if board[rowI][colI] == 0 {
-				isRowComplete = false
-				break
-			}
-		}
-		if isRowComplete {
-			completedRows = append(completedRows, rowI)
-		}
-	}
+	rowCells := evaluateRows()
+	cells = append(cells, rowCells...)
+	rowCount := len(rowCells) / 9
 
-	return completedRows
+	colCells := evaluateCols()
+	cells = append(cells, colCells...)
+	colCount := len(colCells) / 9
+
+	squareCells := evaluateSquares()
+	cells = append(cells, squareCells...)
+	squareCount := len(squareCells) / 9
+
+	fmt.Println(cells)
+	fmt.Println(rowCount, colCount, squareCount)
 }
 
-func EvaluateCols() []int {
-	completedCols := []int{}
-
-	for colI := range board[0] {
-		isColComplete := true
-		for rowI := range board {
-			if board[rowI][colI] == 0 {
-				isColComplete = false
-				break
-			}
-		}
-		if isColComplete {
-			completedCols = append(completedCols, colI)
-		}
-	}
-
-	return completedCols
-}
-
-func EvaluateSquares() []Coords {
+func evaluateRows() []Coords {
 	completedCells := []Coords{}
 
-	// Iterate over each 3x3 section
+	for rowI := range board {
+		cells := []Coords{}
+		for colI := range board[rowI] {
+			if board[rowI][colI] == 1 {
+				cells = append(cells, Coords{colI,rowI})
+			}
+		}
+		if len(cells) == 9 {
+			completedCells = append(completedCells, cells...)
+		}
+	}
+
+	return completedCells
+}
+
+func evaluateCols() []Coords {
+	completedCells := []Coords{}
+
+	for colI := range board[0] {
+		cells := []Coords{}
+		for rowI := range board {
+			if board[rowI][colI] == 1 {
+				cells = append(cells, Coords{colI,rowI})
+			}
+		}
+		if len(cells) == 9 {
+			completedCells = append(completedCells, cells...)
+		}
+	}
+
+	return completedCells
+}
+
+func evaluateSquares() []Coords {
+	completedCells := []Coords{}
+
+	// Iterate over each 3x3 square section
 	for rowStart := 0; rowStart < 9; rowStart += 3 {
-			for colStart := 0; colStart < 9; colStart += 3 {
-					cells := []Coords{}
+		for colStart := 0; colStart < 9; colStart += 3 {
+			cells := []Coords{}
 
-					// Check if all elements in the 3x3 section are 1s
-					for rowI := 0; rowI < 3; rowI++ {
-							for colI := 0; colI < 3; colI++ {
-								if board[rowStart+rowI][colStart+colI] == 1 {
-									cells = append(cells, Coords{colStart+colI, rowStart+rowI})
-								}
-							}
+			// Check if all cells in the 3x3 square section are 1s
+			for rowI := 0; rowI < 3; rowI++ {
+				for colI := 0; colI < 3; colI++ {
+					if board[rowStart+rowI][colStart+colI] == 1 {
+						cells = append(cells, Coords{colStart + colI, rowStart + rowI})
 					}
-
-				if len(cells) == 9 {
-					completedCells = append(completedCells, cells...)
 				}
 			}
+
+			if len(cells) == 9 {
+				completedCells = append(completedCells, cells...)
+			}
+		}
 	}
 
 	return completedCells
