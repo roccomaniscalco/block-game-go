@@ -3,13 +3,25 @@ package board
 import (
 	"errors"
 	"fmt"
-	"strings"
+	"math/rand"
+)
+
+// ANSI escape codes for colors
+const (
+	Reset  = "\033[0m"
+	Red    = "\033[31m"
+	Green  = "\033[32m"
+	Yellow = "\033[33m"
+	Blue   = "\033[34m"
+	Purple = "\033[35m"
+	Cyan   = "\033[36m"
+	White  = "\033[37m"
 )
 
 var board = [9][9]int{
-	{0, 0, 0, 0, 1, 1, 1, 0, 0},
-	{0, 0, 0, 0, 1, 1, 1, 0, 0},
-	{0, 0, 0, 0, 1, 1, 1, 0, 0},
+	{0, 0, 0, 1, 1, 1, 1, 0, 0},
+	{0, 0, 0, 1, 1, 1, 1, 0, 0},
+	{0, 0, 0, 1, 1, 1, 1, 0, 0},
 	{0, 0, 0, 1, 0, 0, 0, 0, 0},
 	{0, 0, 0, 1, 0, 0, 0, 0, 0},
 	{0, 0, 0, 1, 0, 0, 0, 0, 0},
@@ -20,13 +32,21 @@ var board = [9][9]int{
 
 type Coords = [2]int
 
-// func init() {
-// 	for rowI := range board {
-// 		for colI := range board[rowI] {
-// 			board[rowI][colI] = 0
-// 		}
-// 	}
-// }
+func FillEmpty() {
+	for rowI := range board {
+		for colI := range board[rowI] {
+			board[rowI][colI] = 0
+		}
+	}
+}
+
+func FillRandom() {
+	for rowI := range board {
+		for colI := range board[rowI] {
+			board[rowI][colI] = rand.Intn(2)
+		}
+	}
+}
 
 func PlacePattern(pattern [][]int, coords Coords) error {
 	startX, startY := coords[0], coords[1]
@@ -55,23 +75,16 @@ func PlacePattern(pattern [][]int, coords Coords) error {
 	return nil
 }
 
-func Evaluate() {
-	cells := []Coords{}
+func Evaluate() ([]Coords, int) {
+	completedCells := []Coords{}
+	completionCount := 0
 
-	rowCells := evaluateRows()
-	cells = append(cells, rowCells...)
-	rowCount := len(rowCells) / 9
+	for _, cells := range [][]Coords{evaluateRows(), evaluateCols(), evaluateSquares()} {
+		completedCells = append(completedCells, cells...)
+		completionCount += len(cells) / 9
+	}
 
-	colCells := evaluateCols()
-	cells = append(cells, colCells...)
-	colCount := len(colCells) / 9
-
-	squareCells := evaluateSquares()
-	cells = append(cells, squareCells...)
-	squareCount := len(squareCells) / 9
-
-	fmt.Println(cells)
-	fmt.Println(rowCount, colCount, squareCount)
+	return completedCells, completionCount
 }
 
 func evaluateRows() []Coords {
@@ -136,13 +149,26 @@ func evaluateSquares() []Coords {
 	return completedCells
 }
 
-func ToString() string {
-	var builder strings.Builder
+func ToString(highlight []Coords) string {
+	str := ""
 	for rowI := range board {
 		for colI := range board[rowI] {
-			builder.WriteString(fmt.Sprintf("%d ", board[rowI][colI]))
+
+			isInHighlight := false
+			for _, coord := range highlight {
+				if coord[0] == colI && coord[1] == rowI {
+					isInHighlight = true
+				}
+			}
+
+			if isInHighlight {
+				str += Red + fmt.Sprintf("%d ", board[rowI][colI]) + Reset
+			} else {
+				str += fmt.Sprintf("%d ", board[rowI][colI])
+			}
+
 		}
-		builder.WriteString("\n")
+		str += "\n"
 	}
-	return builder.String()
+	return str
 }
