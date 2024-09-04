@@ -8,6 +8,8 @@ import (
 
 var board [9][9]int
 
+type Coords = [2]int
+
 func init() {
 	for rowI := range board {
 		for colI := range board[rowI] {
@@ -16,7 +18,7 @@ func init() {
 	}
 }
 
-func PlacePattern(pattern [][]int, coords []int) error {
+func PlacePattern(pattern [][]int, coords Coords) error {
 	startX, startY := coords[0], coords[1]
 
 	if startX < 0 || startY < 0 || startX > 8 || startY > 8 {
@@ -51,6 +53,7 @@ func EvaluateRows() []int {
 		for colI := range board[rowI] {
 			if board[rowI][colI] == 0 {
 				isRowComplete = false
+				break
 			}
 		}
 		if isRowComplete {
@@ -69,6 +72,7 @@ func EvaluateCols() []int {
 		for rowI := range board {
 			if board[rowI][colI] == 0 {
 				isColComplete = false
+				break
 			}
 		}
 		if isColComplete {
@@ -77,6 +81,32 @@ func EvaluateCols() []int {
 	}
 
 	return completedCols
+}
+
+func EvaluateSquares() []Coords {
+	completedCells := []Coords{}
+
+	// Iterate over each 3x3 section
+	for rowStart := 0; rowStart < 9; rowStart += 3 {
+			for colStart := 0; colStart < 9; colStart += 3 {
+					cells := []Coords{}
+
+					// Check if all elements in the 3x3 section are 1s
+					for rowI := 0; rowI < 3; rowI++ {
+							for colI := 0; colI < 3; colI++ {
+								if board[rowStart+rowI][colStart+colI] == 1 {
+									cells = append(cells, Coords{colStart+colI, rowStart+rowI})
+								}
+							}
+					}
+
+				if len(cells) == 9 {
+					completedCells = append(completedCells, cells...)
+				}
+			}
+	}
+
+	return completedCells
 }
 
 func ToString() string {

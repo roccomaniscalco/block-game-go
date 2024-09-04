@@ -8,32 +8,21 @@ import (
 
 func main() {
 	piece := piece.Piece{Shape: "1x1"}
-	fmt.Println(piece.GetPattern())
-	board.PlacePattern(piece.GetPattern(), []int{0, 3})
-	board.PlacePattern(piece.GetPattern(), []int{1, 3})
-	board.PlacePattern(piece.GetPattern(), []int{2, 3})
-	board.PlacePattern(piece.GetPattern(), []int{3, 3})
-	board.PlacePattern(piece.GetPattern(), []int{4, 3})
-	board.PlacePattern(piece.GetPattern(), []int{5, 3})
-	board.PlacePattern(piece.GetPattern(), []int{6, 3})
-	board.PlacePattern(piece.GetPattern(), []int{7, 3})
-	board.PlacePattern(piece.GetPattern(), []int{8, 3})
 
-	board.PlacePattern(piece.GetPattern(), []int{4, 0})
-	board.PlacePattern(piece.GetPattern(), []int{4, 1})
-	board.PlacePattern(piece.GetPattern(), []int{4, 2})
-	board.PlacePattern(piece.GetPattern(), []int{4, 3})
-	board.PlacePattern(piece.GetPattern(), []int{4, 4})
-	board.PlacePattern(piece.GetPattern(), []int{4, 5})
-	board.PlacePattern(piece.GetPattern(), []int{4, 6})
-	board.PlacePattern(piece.GetPattern(), []int{4, 7})
-	board.PlacePattern(piece.GetPattern(), []int{4, 8})
+	board.PlacePattern(piece.GetPattern(), board.Coords{0, 0})
+	board.PlacePattern(piece.GetPattern(), board.Coords{0, 1})
+	board.PlacePattern(piece.GetPattern(), board.Coords{0, 2})
+	board.PlacePattern(piece.GetPattern(), board.Coords{1, 0})
+	board.PlacePattern(piece.GetPattern(), board.Coords{1, 1})
+	board.PlacePattern(piece.GetPattern(), board.Coords{1, 2})
+	board.PlacePattern(piece.GetPattern(), board.Coords{2, 0})
+	board.PlacePattern(piece.GetPattern(), board.Coords{2, 1})
+	board.PlacePattern(piece.GetPattern(), board.Coords{2, 2})
 
-	completedRows := board.EvaluateRows()
-	completedCols := board.EvaluateCols()
-	fmt.Println(completedRows, completedCols)
+	completedSquares := board.EvaluateSquares()
+	fmt.Println(completedSquares)
 
-	err := board.PlacePattern(piece.GetPattern(), []int{2, 3})
+	err := board.PlacePattern(piece.GetPattern(), board.Coords{5, 5})
 	if err != nil {
 		fmt.Println(err)
 	}
