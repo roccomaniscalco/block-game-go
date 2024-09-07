@@ -2,40 +2,30 @@ package board
 
 import (
 	"errors"
-	"fmt"
-)
-
-// ANSI escape codes for colors
-const (
-	Reset  = "\033[0m"
-	Red    = "\033[31m"
-	Green  = "\033[32m"
-	Yellow = "\033[33m"
-	Blue   = "\033[34m"
-	Purple = "\033[35m"
-	Cyan   = "\033[36m"
-	White  = "\033[37m"
 )
 
 type Board struct {
-	Grid [9][9]int
+	Grid [9][9]bool
 }
 
-type Coords = [2]int
+type Cell struct {
+	RowI int
+	ColI int
+}
 
-func (b *Board) PlacePattern(pattern [][]int, coords Coords) error {
-	startX, startY := coords[0], coords[1]
+func (b *Board) PlacePattern(pattern [][]bool, startCell Cell) error {
+	rowStart, colStart := startCell.RowI, startCell.ColI
 
-	if startX < 0 || startY < 0 || startX > 8 || startY > 8 {
-		return errors.New("coords must be within range 0-8 inclusive")
+	if colStart < 0 || rowStart < 0 || colStart > 8 || rowStart > 8 {
+		return errors.New("position must be within range 0-8 inclusive")
 	}
 
 	for rowI := range pattern {
 		for colI := range pattern[rowI] {
-			if startY+rowI > len(b.Grid) || startX+colI > len(b.Grid[rowI]) {
+			if rowStart+rowI > len(b.Grid) || colStart+colI > len(b.Grid[rowI]) {
 				return errors.New("pattern goes out of bounds")
 			}
-			if pattern[rowI][colI] == 1 && b.Grid[startY+rowI][startX+colI] == 1 {
+			if pattern[rowI][colI] && b.Grid[rowStart+rowI][colStart+colI] {
 				return errors.New("pattern overlaps filled game board tiles")
 			}
 		}
@@ -43,7 +33,7 @@ func (b *Board) PlacePattern(pattern [][]int, coords Coords) error {
 
 	for rowI := range pattern {
 		for colI := range pattern[rowI] {
-			b.Grid[startY+rowI][startX+colI] = pattern[rowI][colI]
+			b.Grid[rowStart+rowI][colStart+colI] = pattern[rowI][colI]
 		}
 	}
 
@@ -51,10 +41,11 @@ func (b *Board) PlacePattern(pattern [][]int, coords Coords) error {
 }
 
 func (b *Board) Evaluate() int {
-	completedCells := []Coords{}
+	completedCells := []Cell{}
 	completionCount := 0
 
-	for _, cells := range [][]Coords{b.evaluateRows(), b.evaluateCols(), b.evaluateSquares()} {
+	evaluations := [][]Cell{b.evaluateRows(), b.evaluateCols(), b.evaluateSquares()}
+	for _, cells := range evaluations {
 		completedCells = append(completedCells, cells...)
 		completionCount += len(cells) / 9
 	}
@@ -64,14 +55,14 @@ func (b *Board) Evaluate() int {
 	return completionCount
 }
 
-func (b *Board) evaluateRows() []Coords {
-	completedCells := []Coords{}
+func (b *Board) evaluateRows() []Cell {
+	completedCells := []Cell{}
 
 	for rowI := range b.Grid {
-		cells := []Coords{}
+		cells := []Cell{}
 		for colI := range b.Grid[rowI] {
-			if b.Grid[rowI][colI] == 1 {
-				cells = append(cells, Coords{colI, rowI})
+			if b.Grid[rowI][colI] {
+				cells = append(cells, Cell{RowI: rowI, ColI: colI})
 			}
 		}
 		if len(cells) == 9 {
@@ -82,14 +73,14 @@ func (b *Board) evaluateRows() []Coords {
 	return completedCells
 }
 
-func (b *Board) evaluateCols() []Coords {
-	completedCells := []Coords{}
+func (b *Board) evaluateCols() []Cell {
+	completedCells := []Cell{}
 
 	for colI := range b.Grid[0] {
-		cells := []Coords{}
+		cells := []Cell{}
 		for rowI := range b.Grid {
-			if b.Grid[rowI][colI] == 1 {
-				cells = append(cells, Coords{colI, rowI})
+			if b.Grid[rowI][colI] {
+				cells = append(cells, Cell{RowI: rowI, ColI: colI})
 			}
 		}
 		if len(cells) == 9 {
@@ -100,19 +91,20 @@ func (b *Board) evaluateCols() []Coords {
 	return completedCells
 }
 
-func (b *Board) evaluateSquares() []Coords {
-	completedCells := []Coords{}
+func (b *Board) evaluateSquares() []Cell {
+	completedCells := []Cell{}
 
 	// Iterate over each 3x3 square section
 	for rowStart := 0; rowStart < 9; rowStart += 3 {
 		for colStart := 0; colStart < 9; colStart += 3 {
-			cells := []Coords{}
+			cells := []Cell{}
 
 			// Check if all cells in the 3x3 square section are 1s
 			for rowI := 0; rowI < 3; rowI++ {
 				for colI := 0; colI < 3; colI++ {
-					if b.Grid[rowStart+rowI][colStart+colI] == 1 {
-						cells = append(cells, Coords{colStart + colI, rowStart + rowI})
+					if b.Grid[rowStart+rowI][colStart+colI] {
+						cell := Cell{RowI: rowStart + rowI, ColI: colStart + colI}
+						cells = append(cells, cell)
 					}
 				}
 			}
@@ -126,13 +118,13 @@ func (b *Board) evaluateSquares() []Coords {
 	return completedCells
 }
 
-func (b *Board) removeCells(cells []Coords) {
+func (b *Board) removeCells(cells []Cell) {
 	for rowI := range b.Grid {
 		for colI := range b.Grid[rowI] {
 			for _, cellToRemove := range cells {
-				boardCell := Coords{colI, rowI}
+				boardCell := Cell{RowI: rowI, ColI: colI}
 				if cellToRemove == boardCell {
-					b.Grid[rowI][colI] = 0
+					b.Grid[rowI][colI] = false
 				}
 			}
 		}
@@ -143,20 +135,11 @@ func (b *Board) ToString() string {
 	str := ""
 	for rowI := range b.Grid {
 		for colI := range b.Grid[rowI] {
-
-			// isInHighlight := false
-			// for _, coord := range highlight {
-			// 	if coord[0] == colI && coord[1] == rowI {
-			// 		isInHighlight = true
-			// 	}
-			// }
-
-			// if isInHighlight {
-			// 	str += Red + fmt.Sprintf("%d ", b.Grid[rowI][colI]) + Reset
-			// } else {
-			str += fmt.Sprintf("%d ", b.Grid[rowI][colI])
-			// }
-
+			if b.Grid[rowI][colI] {
+				str += "▣ "
+			} else {
+				str += "□ "
+			}
 		}
 		str += "\n"
 	}
