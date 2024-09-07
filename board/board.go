@@ -3,7 +3,6 @@ package board
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 )
 
 // ANSI escape codes for colors
