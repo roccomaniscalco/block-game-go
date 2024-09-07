@@ -58,7 +58,7 @@ func PlacePattern(pattern [][]int, coords Coords) error {
 	return nil
 }
 
-func Evaluate() ([]Coords, int) {
+func Evaluate() int {
 	completedCells := []Coords{}
 	completionCount := 0
 
@@ -67,7 +67,9 @@ func Evaluate() ([]Coords, int) {
 		completionCount += len(cells) / 9
 	}
 
-	return completedCells, completionCount
+	removeCells(completedCells)
+
+	return completionCount
 }
 
 func evaluateRows() []Coords {
@@ -77,7 +79,7 @@ func evaluateRows() []Coords {
 		cells := []Coords{}
 		for colI := range board[rowI] {
 			if board[rowI][colI] == 1 {
-				cells = append(cells, Coords{colI,rowI})
+				cells = append(cells, Coords{colI, rowI})
 			}
 		}
 		if len(cells) == 9 {
@@ -95,7 +97,7 @@ func evaluateCols() []Coords {
 		cells := []Coords{}
 		for rowI := range board {
 			if board[rowI][colI] == 1 {
-				cells = append(cells, Coords{colI,rowI})
+				cells = append(cells, Coords{colI, rowI})
 			}
 		}
 		if len(cells) == 9 {
@@ -132,23 +134,36 @@ func evaluateSquares() []Coords {
 	return completedCells
 }
 
-func ToString(highlight []Coords) string {
+func removeCells(cells []Coords) {
+	for rowI := range board {
+		for colI := range board[rowI] {
+			for _, cellToRemove := range cells {
+				boardCell := Coords{colI, rowI}
+				if cellToRemove == boardCell {
+					board[rowI][colI] = 0
+				}
+			}
+		}
+	}
+}
+
+func ToString() string {
 	str := ""
 	for rowI := range board {
 		for colI := range board[rowI] {
 
-			isInHighlight := false
-			for _, coord := range highlight {
-				if coord[0] == colI && coord[1] == rowI {
-					isInHighlight = true
-				}
-			}
+			// isInHighlight := false
+			// for _, coord := range highlight {
+			// 	if coord[0] == colI && coord[1] == rowI {
+			// 		isInHighlight = true
+			// 	}
+			// }
 
-			if isInHighlight {
-				str += Red + fmt.Sprintf("%d ", board[rowI][colI]) + Reset
-			} else {
+			// if isInHighlight {
+			// 	str += Red + fmt.Sprintf("%d ", board[rowI][colI]) + Reset
+			// } else {
 				str += fmt.Sprintf("%d ", board[rowI][colI])
-			}
+			// }
 
 		}
 		str += "\n"

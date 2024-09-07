@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	cells, count := board.Evaluate()
-	fmt.Printf("count: %d\n", count)
-	fmt.Println(board.ToString(cells))
+	fmt.Println(board.ToString())
+	board.Evaluate()
+	fmt.Println(board.ToString())
 }
