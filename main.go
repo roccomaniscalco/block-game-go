@@ -21,7 +21,8 @@ func main() {
 		},
 	}
 
-	fmt.Println(b.ToString())
+	bCopy := b
 	b.Evaluate()
-	fmt.Println(b.ToString())
+	diff := b.Diff(bCopy)
+	fmt.Println(b.ToString(diff))
 }
