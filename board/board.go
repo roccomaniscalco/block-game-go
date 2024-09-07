@@ -32,22 +32,6 @@ var board = [9][9]int{
 
 type Coords = [2]int
 
-func FillEmpty() {
-	for rowI := range board {
-		for colI := range board[rowI] {
-			board[rowI][colI] = 0
-		}
-	}
-}
-
-func FillRandom() {
-	for rowI := range board {
-		for colI := range board[rowI] {
-			board[rowI][colI] = rand.Intn(2)
-		}
-	}
-}
-
 func PlacePattern(pattern [][]int, coords Coords) error {
 	startX, startY := coords[0], coords[1]
 
