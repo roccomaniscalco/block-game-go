@@ -33,7 +33,7 @@ func (b *Board) ToString(diff Diff) string {
 	str := ""
 	for rowI := range b.Grid {
 		for colI := range b.Grid[rowI] {
-			str+= diff.ColorGrid[rowI][colI]
+			str += diff.ColorGrid[rowI][colI]
 			if b.Grid[rowI][colI] {
 				str += "▣ "
 			} else {
