@@ -29,7 +29,30 @@ type Cell struct {
 	ColI int
 }
 
-func (b *Board) ToString(diff Diff) string {
+func (b *Board) Reset() {
+	for rowI := range b.Grid {
+		for colI := range b.Grid[rowI] {
+			b.Grid[rowI][colI] = false
+		}
+	}
+}
+
+func (b *Board) ToString() string {
+	str := ""
+	for rowI := range b.Grid {
+		for colI := range b.Grid[rowI] {
+			if b.Grid[rowI][colI] {
+				str += "▣ "
+			} else {
+				str += "□ "
+			}
+		}
+		str += "\n"
+	}
+	return str
+}
+
+func (b *Board) ToDiffString(diff Diff) string {
 	str := ""
 	for rowI := range b.Grid {
 		for colI := range b.Grid[rowI] {
