@@ -11,16 +11,18 @@ import (
 )
 
 type model struct {
-	pieceChoices   []piece.Piece
-	activePieceI   int
-	activePiecePos board.Cell
+	board    board.Board
+	boardPos board.Cell
+	pieces   []piece.Piece
+	pieceI int
 }
 
 func initialModel() model {
 	return model{
-		pieceChoices:   []piece.Piece{piece.RandomPiece(), piece.RandomPiece(), piece.RandomPiece()},
-		activePieceI:   0,
-		activePiecePos: board.Cell{RowI: 0, ColI: 0},
+		board:    board.NewBoard(),
+		boardPos: board.Cell{RowI: 0, ColI: 0},
+		pieces:   []piece.Piece{piece.RandomPiece(), piece.RandomPiece(), piece.RandomPiece()},
+		pieceI: 0,
 	}
 }
 
@@ -37,21 +39,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// piece selection
 		case "1":
-			m.activePieceI = 0
+			m.pieceI = 0
 		case "2":
-			m.activePieceI = 1
+			m.pieceI = 1
 		case "3":
-			m.activePieceI = 2
+			m.pieceI = 2
 
 		// piece movement
 		case "left":
-			m.activePiecePos.ColI--
+			m.boardPos.ColI--
 		case "right":
-			m.activePiecePos.ColI++
+			m.boardPos.ColI++
 		case "up":
-			m.activePiecePos.RowI--
+			m.boardPos.RowI--
 		case "down":
-			m.activePiecePos.RowI++
+			m.boardPos.RowI++
 
 		}
 	}
@@ -61,17 +63,35 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	pieces := []string{}
 
-	for i, choice := range m.pieceChoices {
+	for i, choice := range m.pieces {
 		piece := ""
-		if i == m.activePieceI {
-			piece = lipgloss.NewStyle().MarginRight(2).Foreground(lipgloss.Color("#FF00FF")).Render(choice.ToString())
+		if i == m.pieceI {
+			piece = lipgloss.NewStyle().MarginBottom(2).Foreground(lipgloss.Color("#FF00FF")).Render(choice.ToString())
 		} else {
-			piece = lipgloss.NewStyle().MarginRight(2).Render(choice.ToString())
+			piece = lipgloss.NewStyle().MarginBottom(2).Render(choice.ToString())
 		}
 		pieces = append(pieces, piece)
 	}
 
-	return lipgloss.JoinHorizontal(lipgloss.Center, pieces...)
+	boardUI := ""
+	
+	for rowI := range m.board.Grid {
+		for colI := range m.board.Grid[rowI] {
+			if m.boardPos.RowI == rowI && m.boardPos.ColI == colI {
+				boardUI += lipgloss.NewStyle().Foreground(lipgloss.Color("#FF00FF")).Render("▣ ")
+			} else {
+				if m.board.Grid[rowI][colI] {
+					boardUI += "▣ "
+				} else {
+					boardUI += "□ "
+				}
+			}
+		}
+		boardUI += "\n"
+	}
+
+	piecesUI := lipgloss.JoinVertical(lipgloss.Center, pieces...)
+	return lipgloss.JoinHorizontal(lipgloss.Top, piecesUI, boardUI)
 }
 
 func Play() {

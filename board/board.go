@@ -29,12 +29,16 @@ type Cell struct {
 	ColI int
 }
 
-func (b *Board) Reset() {
-	for rowI := range b.Grid {
-		for colI := range b.Grid[rowI] {
-			b.Grid[rowI][colI] = false
+func NewBoard() Board {
+	board := Board{}
+
+	for rowI := range board.Grid {
+		for colI := range board.Grid[rowI] {
+			board.Grid[rowI][colI] = false
 		}
 	}
+
+	return board
 }
 
 func (b *Board) ToString() string {
