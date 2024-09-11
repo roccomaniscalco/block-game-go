@@ -103,12 +103,17 @@ func (p *Piece) ToString() string {
 	for rowI := range p.Grid {
 		for colI := range p.Grid[rowI] {
 			if p.Grid[rowI][colI] {
-				str += "▣ "
+				str += "▣"
 			} else {
-				str += "□ "
+				str += " "
+			}
+			if colI < len(p.Grid[rowI])-1 {
+				str += " "
 			}
 		}
-		str += "\n"
+		if rowI < len(p.Grid)-1 {
+			str += "\n"
+		}
 	}
 	return str
 }
