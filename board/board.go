@@ -93,7 +93,9 @@ func (b *Board) PlacePattern(pattern [][]bool, start Cell) error {
 
 	for rowI := range pattern {
 		for colI := range pattern[rowI] {
-			b.Grid[rowStart+rowI][colStart+colI] = pattern[rowI][colI]
+			if pattern[rowI][colI] {
+				b.Grid[rowStart+rowI][colStart+colI] = pattern[rowI][colI]
+			}
 		}
 	}
 
