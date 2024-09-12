@@ -5,7 +5,9 @@ import (
 )
 
 type Board struct {
-	Grid [9][9]bool
+	Grid       [9][9]bool
+	Score      int
+	Multiplier int
 }
 
 type Cell struct {
@@ -14,7 +16,10 @@ type Cell struct {
 }
 
 func NewBoard() Board {
-	board := Board{}
+	board := Board{
+		Score:      0,
+		Multiplier: 1,
+	}
 
 	for rowI := range board.Grid {
 		for colI := range board.Grid[rowI] {
@@ -69,7 +74,7 @@ func (b *Board) PlacePattern(pattern [][]bool, start Cell) error {
 	return nil
 }
 
-func (b *Board) Evaluate() int {
+func (b *Board) Evaluate() {
 	completedCells := []Cell{}
 	completionCount := 0
 
@@ -79,9 +84,16 @@ func (b *Board) Evaluate() int {
 		completionCount += len(cells) / 9
 	}
 
-	b.removeCells(completedCells)
+	removedCellCount := b.removeCells(completedCells)
 
-	return completionCount
+	// TODO: Include placed piece size in score calculation
+	b.Score += (removedCellCount * b.Multiplier)
+
+	if completionCount == 0 {
+		b.Multiplier = 1
+	} else {
+		b.Multiplier += completionCount
+	}
 }
 
 func (b *Board) evaluateRows() []Cell {
@@ -147,15 +159,20 @@ func (b *Board) evaluateSquares() []Cell {
 	return completedCells
 }
 
-func (b *Board) removeCells(cells []Cell) {
+func (b *Board) removeCells(cells []Cell) int {
+	uniqueCellCount := 0
+
 	for rowI := range b.Grid {
 		for colI := range b.Grid[rowI] {
 			for _, cellToRemove := range cells {
 				boardCell := Cell{RowI: rowI, ColI: colI}
-				if cellToRemove == boardCell {
+				if cellToRemove == boardCell && b.Grid[rowI][colI] {
 					b.Grid[rowI][colI] = false
+					uniqueCellCount++
 				}
 			}
 		}
 	}
+
+	return uniqueCellCount
 }

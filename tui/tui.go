@@ -66,6 +66,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+func (m model) View() string {
+	return lipgloss.JoinHorizontal(lipgloss.Top, m.piecesUI(), m.boardUI(), m.scoreUI())
+}
+
 func (m model) piecesUI() string {
 	pieces := []string{}
 
@@ -97,8 +101,8 @@ func (m model) boardUI() string {
 	return m.board.ToString()
 }
 
-func (m model) View() string {
-	return lipgloss.JoinHorizontal(lipgloss.Top, m.piecesUI(), m.boardUI())
+func (m model) scoreUI() string {
+	return fmt.Sprintf("Score: %d\nMultiplier: %d", m.board.Score, m.board.Multiplier)
 }
 
 func Play() {
