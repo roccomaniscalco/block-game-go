@@ -57,6 +57,14 @@ var shapes = [][][]int{
 	},
 }
 
+func (p *Piece) Width() int {
+	return len(p.Grid[0])
+}
+
+func (p *Piece) Height() int {
+	return len(p.Grid)
+}
+
 func RandomPiece() Piece {
 	randomShape := shapes[rand.Intn(len(shapes))]
 	piece := Piece{Grid: convertShapeToGrid(randomShape)}

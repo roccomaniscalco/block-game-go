@@ -31,6 +31,8 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	selectedPiece := m.pieces[m.pieceI]
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -49,16 +51,28 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// piece movement
 		case "left":
 			m.boardPos.ColI--
+			if m.boardPos.ColI < 0 {
+				m.boardPos.ColI = 9 - selectedPiece.Width()
+			}
 		case "right":
 			m.boardPos.ColI++
+			if m.boardPos.ColI+selectedPiece.Width() > 9 {
+				m.boardPos.ColI = 0
+			}
 		case "up":
 			m.boardPos.RowI--
+			if m.boardPos.RowI < 0 {
+				m.boardPos.RowI = 9 - selectedPiece.Height()
+			}
 		case "down":
 			m.boardPos.RowI++
+			if m.boardPos.RowI+selectedPiece.Height() > 9 {
+				m.boardPos.RowI = 0
+			}
 
 		// piece placement
 		case "enter", " ":
-			m.board.PlacePattern(m.pieces[m.pieceI].Grid, m.boardPos)
+			m.board.PlacePattern(selectedPiece.Grid, m.boardPos)
 			m.board.Evaluate()
 		}
 	}
