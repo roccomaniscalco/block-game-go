@@ -57,17 +57,9 @@ var shapes = [][][]int{
 	},
 }
 
-func (p *Piece) Width() int {
-	return len(p.Grid[0])
-}
-
-func (p *Piece) Height() int {
-	return len(p.Grid)
-}
-
 func RandomPiece() Piece {
 	randomShape := shapes[rand.Intn(len(shapes))]
-	piece := Piece{Grid: convertShapeToGrid(randomShape)}
+	piece := Piece{Grid: convertIntsToBools(randomShape)}
 
 	randomRotationCount := rand.Intn(4)
 	for i := 0; i < randomRotationCount; i++ {
@@ -77,7 +69,7 @@ func RandomPiece() Piece {
 	return piece
 }
 
-func convertShapeToGrid(shape [][]int) [][]bool {
+func convertIntsToBools(shape [][]int) [][]bool {
 	grid := make([][]bool, len(shape))
 	for rowI := range grid {
 		grid[rowI] = make([]bool, len(shape[rowI]))
@@ -86,6 +78,14 @@ func convertShapeToGrid(shape [][]int) [][]bool {
 		}
 	}
 	return grid
+}
+
+func (p *Piece) Width() int {
+	return len(p.Grid[0])
+}
+
+func (p *Piece) Height() int {
+	return len(p.Grid)
 }
 
 func (p *Piece) rotate90Deg() {
