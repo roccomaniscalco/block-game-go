@@ -34,6 +34,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
+		// quit
 		case "ctrl+c", "q":
 			return m, tea.Quit
 
@@ -54,30 +55,50 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.boardPos.RowI--
 		case "down":
 			m.boardPos.RowI++
+
+		// piece placement
+		case "enter", " ":
+			m.board.PlacePattern(m.pieces[m.pieceI].Grid, m.boardPos)
+			m.board.Evaluate()
 		}
 	}
+
 	return m, nil
 }
 
-func (m model) View() string {
+func (m model) piecesUI() string {
 	pieces := []string{}
 
 	for i, choice := range m.pieces {
 		piece := ""
 		if i == m.pieceI {
-			piece = lipgloss.NewStyle().MarginBottom(2).Foreground(lipgloss.Color("#FF00FF")).Render(choice.ToString())
+			piece = lipgloss.NewStyle().MarginBottom(1).Foreground(lipgloss.Color("#FF00FF")).Render(choice.ToString())
 		} else {
-			piece = lipgloss.NewStyle().MarginBottom(2).Render(choice.ToString())
+			piece = lipgloss.NewStyle().MarginBottom(1).Render(choice.ToString())
 		}
 		pieces = append(pieces, piece)
 	}
 
-	selectedPiece := m.pieces[m.pieceI]
-	m.board.PlacePattern(selectedPiece.Grid, m.boardPos)
-	boardUI := m.board.ToString()
+	return lipgloss.NewStyle().MarginRight(2).Render(lipgloss.JoinVertical(lipgloss.Center, pieces...))
+}
 
-	piecesUI := lipgloss.JoinVertical(lipgloss.Center, pieces...)
-	return lipgloss.JoinHorizontal(lipgloss.Top, piecesUI, boardUI)
+func (m model) boardUI() string {
+	selectedPiece := m.pieces[m.pieceI]
+
+	for rowI := range selectedPiece.Grid {
+		for colI := range selectedPiece.Grid[rowI] {
+			if selectedPiece.Grid[rowI][colI] {
+				m.board.Grid[m.boardPos.RowI+rowI][m.boardPos.ColI+colI] =
+					selectedPiece.Grid[rowI][colI]
+			}
+		}
+	}
+
+	return m.board.ToString()
+}
+
+func (m model) View() string {
+	return lipgloss.JoinHorizontal(lipgloss.Top, m.piecesUI(), m.boardUI())
 }
 
 func Play() {
