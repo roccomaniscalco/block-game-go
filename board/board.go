@@ -82,7 +82,7 @@ func (b *Board) PlacePattern(pattern [][]bool, start Cell) error {
 
 	for rowI := range pattern {
 		for colI := range pattern[rowI] {
-			if rowStart+rowI > len(b.Grid) || colStart+colI > len(b.Grid[rowI]) {
+			if rowStart+rowI >= len(b.Grid) || colStart+colI >= len(b.Grid[rowI]) {
 				return errors.New("pattern goes out of bounds")
 			}
 			if pattern[rowI][colI] && b.Grid[rowStart+rowI][colStart+colI] {

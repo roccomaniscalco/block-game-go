@@ -14,7 +14,7 @@ type model struct {
 	board    board.Board
 	boardPos board.Cell
 	pieces   []piece.Piece
-	pieceI int
+	pieceI   int
 }
 
 func initialModel() model {
@@ -22,7 +22,7 @@ func initialModel() model {
 		board:    board.NewBoard(),
 		boardPos: board.Cell{RowI: 0, ColI: 0},
 		pieces:   []piece.Piece{piece.RandomPiece(), piece.RandomPiece(), piece.RandomPiece()},
-		pieceI: 0,
+		pieceI:   0,
 	}
 }
 
@@ -54,7 +54,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.boardPos.RowI--
 		case "down":
 			m.boardPos.RowI++
-
 		}
 	}
 	return m, nil
@@ -73,22 +72,9 @@ func (m model) View() string {
 		pieces = append(pieces, piece)
 	}
 
-	boardUI := ""
-	
-	for rowI := range m.board.Grid {
-		for colI := range m.board.Grid[rowI] {
-			if m.boardPos.RowI == rowI && m.boardPos.ColI == colI {
-				boardUI += lipgloss.NewStyle().Foreground(lipgloss.Color("#FF00FF")).Render("▣ ")
-			} else {
-				if m.board.Grid[rowI][colI] {
-					boardUI += "▣ "
-				} else {
-					boardUI += "□ "
-				}
-			}
-		}
-		boardUI += "\n"
-	}
+	selectedPiece := m.pieces[m.pieceI]
+	m.board.PlacePattern(selectedPiece.Grid, m.boardPos)
+	boardUI := m.board.ToString()
 
 	piecesUI := lipgloss.JoinVertical(lipgloss.Center, pieces...)
 	return lipgloss.JoinHorizontal(lipgloss.Top, piecesUI, boardUI)
