@@ -30,21 +30,6 @@ func NewBoard() Board {
 	return board
 }
 
-func (b *Board) ToString() string {
-	str := ""
-	for rowI := range b.Grid {
-		for colI := range b.Grid[rowI] {
-			if b.Grid[rowI][colI] {
-				str += "▣ "
-			} else {
-				str += "□ "
-			}
-		}
-		str += "\n"
-	}
-	return str
-}
-
 func (b *Board) PlacePattern(pattern [][]bool, start Cell) error {
 	rowStart, colStart := start.RowI, start.ColI
 
