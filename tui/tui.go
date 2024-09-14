@@ -102,17 +102,49 @@ func (m model) piecesUI() string {
 
 func (m model) boardUI() string {
 	selectedPiece := m.pieces[m.pieceI]
+	str := ""
 
+	adjSelectedPiece := [9][9]bool{}
 	for rowI := range selectedPiece.Grid {
 		for colI := range selectedPiece.Grid[rowI] {
 			if selectedPiece.Grid[rowI][colI] {
-				m.board.Grid[m.boardPos.RowI+rowI][m.boardPos.ColI+colI] =
-					selectedPiece.Grid[rowI][colI]
+				adjSelectedPiece[rowI+m.boardPos.RowI][colI+m.boardPos.ColI] = selectedPiece.Grid[rowI][colI]
 			}
 		}
 	}
 
-	return m.board.ToString()
+	for rowI := range m.board.Grid {
+		for colI := range m.board.Grid[rowI] {
+			cell := m.board.Grid[rowI][colI]
+			selectedPieceCell := adjSelectedPiece[rowI][colI]
+
+			isLightCell := isLight(board.Cell{RowI: rowI, ColI: colI})
+
+			cellStr := ""
+			if cell {
+				cellStr += "▓▓"
+			} else if isLightCell {
+				cellStr += "░░"
+			} else {
+				cellStr += "▒▒"
+			}
+
+			if selectedPieceCell {
+				cellStr = lipgloss.NewStyle().Background(lipgloss.Color("#FF00FF")).Render(cellStr)
+			}
+
+			str += cellStr
+		}
+		str += "\n"
+	}
+
+	return str
+}
+
+func isLight(cell board.Cell) bool {
+	isInOddRow := cell.RowI/3%2 == 1
+	isInOddCol := cell.ColI/3%2 == 1
+	return isInOddRow != isInOddCol
 }
 
 func (m model) scoreUI() string {
