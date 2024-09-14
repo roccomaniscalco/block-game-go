@@ -3,6 +3,7 @@ package cli
 import (
 	"block-game-go/board"
 	"block-game-go/piece"
+	"block-game-go/util"
 	"fmt"
 	"os"
 
@@ -42,11 +43,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// piece selection
 		case "1":
-			m.pieceI = 0
+			if len(m.pieces) > 0 {
+				m.pieceI = 0
+			}
 		case "2":
-			m.pieceI = 1
+			if len(m.pieces) > 1 {
+				m.pieceI = 1
+			}
 		case "3":
-			m.pieceI = 2
+			if len(m.pieces) > 2 {
+				m.pieceI = 2
+			}
 
 		// piece movement
 		case "left":
@@ -72,8 +79,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// piece placement
 		case "enter", " ":
-			m.board.PlacePattern(selectedPiece.Grid, m.boardPos)
+			err := m.board.PlacePattern(selectedPiece.Grid, m.boardPos)
+			if err != nil {
+				return m, nil
+			}
+
 			m.board.Evaluate()
+
+			m.pieces = util.Remove(m.pieces, m.pieceI)
+			if len(m.pieces) == 0 {
+				m.pieces = []piece.Piece{piece.RandomPiece(), piece.RandomPiece(), piece.RandomPiece()}
+			}
+			if m.pieceI >= len(m.pieces) {
+				m.pieceI = len(m.pieces) - 1
+			}
 		}
 	}
 
