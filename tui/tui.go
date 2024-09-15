@@ -32,8 +32,6 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	selectedPiece := m.pieces[m.pieceI]
-
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -43,43 +41,25 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// piece selection
 		case "1":
-			if len(m.pieces) > 0 {
-				m.pieceI = 0
-			}
+			m.pieceI = 0
 		case "2":
-			if len(m.pieces) > 1 {
-				m.pieceI = 1
-			}
+			m.pieceI = 1
 		case "3":
-			if len(m.pieces) > 2 {
-				m.pieceI = 2
-			}
+			m.pieceI = 2
 
 		// piece movement
 		case "left":
 			m.boardPos.ColI--
-			if m.boardPos.ColI < 0 {
-				m.boardPos.ColI = 9 - selectedPiece.Width()
-			}
 		case "right":
 			m.boardPos.ColI++
-			if m.boardPos.ColI+selectedPiece.Width() > 9 {
-				m.boardPos.ColI = 0
-			}
 		case "up":
 			m.boardPos.RowI--
-			if m.boardPos.RowI < 0 {
-				m.boardPos.RowI = 9 - selectedPiece.Height()
-			}
 		case "down":
 			m.boardPos.RowI++
-			if m.boardPos.RowI+selectedPiece.Height() > 9 {
-				m.boardPos.RowI = 0
-			}
 
 		// piece placement
 		case "enter", " ":
-			err := m.board.PlacePattern(selectedPiece.Grid, m.boardPos)
+			err := m.board.PlacePattern(m.pieces[m.pieceI].Grid, m.boardPos)
 			if err != nil {
 				return m, nil
 			}
@@ -90,10 +70,26 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if len(m.pieces) == 0 {
 				m.pieces = []piece.Piece{piece.RandomPiece(), piece.RandomPiece(), piece.RandomPiece()}
 			}
-			if m.pieceI >= len(m.pieces) {
-				m.pieceI = len(m.pieces) - 1
-			}
 		}
+	}
+
+	// handle out of bounds of pieces
+	if m.pieceI >= len(m.pieces) {
+		m.pieceI = len(m.pieces) - 1
+	}
+
+	// handle out of bounds of board
+	if m.boardPos.ColI < 0 {
+		m.boardPos.ColI = 9 - m.pieces[m.pieceI].Width()
+	}
+	if m.boardPos.ColI+m.pieces[m.pieceI].Width() > 9 {
+		m.boardPos.ColI = 0
+	}
+	if m.boardPos.RowI < 0 {
+		m.boardPos.RowI = 9 - m.pieces[m.pieceI].Height()
+	}
+	if m.boardPos.RowI+m.pieces[m.pieceI].Height() > 9 {
+		m.boardPos.RowI = 0
 	}
 
 	return m, nil
