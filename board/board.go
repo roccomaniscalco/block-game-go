@@ -73,12 +73,14 @@ func (b *Board) evaluate(piece piece.Piece) {
 	}
 
 	// Update score
-	completionBonus := len(completedCells) * 2
+	comboBonus := 0
 	if completionCount > 1 {
-		completionBonus += (completionCount - 1) * 10
+		comboBonus += (completionCount - 1) * 10
 	}
 	streakBonus := b.Streak * 10
-	b.Score += piece.Points() + completionBonus + streakBonus
+	completionPoints := len(completedCells) * 2
+
+	b.Score += piece.Points() + completionPoints + comboBonus + streakBonus
 
 	// Update streak
 	if completionCount > 0 {
