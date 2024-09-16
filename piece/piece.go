@@ -80,6 +80,18 @@ func convertIntsToBools(shape [][]int) [][]bool {
 	return grid
 }
 
+func (p *Piece) Points() int {
+	points := 0
+	for rowI := range p.Grid {
+		for colI := range p.Grid[rowI] {
+			if p.Grid[rowI][colI] {
+				points++
+			}
+		}
+	}
+	return points
+}
+
 func (p *Piece) Width() int {
 	return len(p.Grid[0])
 }
