@@ -11,6 +11,12 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+var styles = struct {
+	border lipgloss.Style
+}{
+	border: lipgloss.NewStyle().Border(lipgloss.RoundedBorder(), true, true, true, true),
+}
+
 type model struct {
 	board    board.Board
 	boardPos board.Cell
@@ -105,14 +111,14 @@ func (m model) piecesUI() string {
 	for i, choice := range m.pieces {
 		piece := ""
 		if i == m.pieceI {
-			piece = lipgloss.NewStyle().MarginBottom(1).Foreground(lipgloss.Color("#FF00FF")).Render(choice.ToString())
+			piece = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF00FF")).Render(choice.ToString())
 		} else {
-			piece = lipgloss.NewStyle().MarginBottom(1).Render(choice.ToString())
+			piece = lipgloss.NewStyle().Render(choice.ToString())
 		}
 		pieces = append(pieces, piece)
 	}
 
-	return lipgloss.NewStyle().MarginRight(2).Render(lipgloss.JoinVertical(lipgloss.Center, pieces...))
+	return styles.border.Width(11).Height(18).AlignHorizontal(lipgloss.Center).Render(lipgloss.JoinVertical(lipgloss.Center, pieces...))
 }
 
 func (m model) boardUI() string {
@@ -135,13 +141,14 @@ func (m model) boardUI() string {
 
 			isLightCell := isLight(board.Cell{RowI: rowI, ColI: colI})
 
-			cellStr := ""
-			if cell {
-				cellStr += "▓▓"
-			} else if isLightCell {
-				cellStr += "░░"
-			} else {
-				cellStr += "▒▒"
+			var cellStr string
+			switch {
+			case cell:
+				cellStr = "▓▓"
+			case isLightCell:
+				cellStr = "░░"
+			default:
+				cellStr = "▒▒"
 			}
 
 			if selectedPieceCell {
@@ -150,10 +157,13 @@ func (m model) boardUI() string {
 
 			str += cellStr
 		}
-		str += "\n"
+
+		if rowI < len(m.board.Grid)-1 {
+			str += "\n"
+		}
 	}
 
-	return str
+	return styles.border.MarginRight(1).Render(str)
 }
 
 func isLight(cell board.Cell) bool {

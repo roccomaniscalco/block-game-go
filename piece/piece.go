@@ -119,9 +119,7 @@ func (p *Piece) ToString() string {
 				str += " "
 			}
 		}
-		if rowI < len(p.Grid)-1 {
-			str += "\n"
-		}
+		str += "\n"
 	}
 	return str
 }
