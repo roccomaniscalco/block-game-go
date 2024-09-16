@@ -57,10 +57,12 @@ func (b *Board) PlacePiece(piece piece.Piece, start Cell) error {
 		}
 	}
 
+	b.evaluate(piece)
+
 	return nil
 }
 
-func (b *Board) Evaluate() {
+func (b *Board) evaluate(piece piece.Piece) {
 	completedCells := []Cell{}
 	completionCount := 0
 
@@ -72,8 +74,7 @@ func (b *Board) Evaluate() {
 
 	removedCellCount := b.removeCells(completedCells)
 
-	// TODO: Include placed piece size in score calculation
-	b.Score += (removedCellCount * b.Multiplier)
+	b.Score += piece.Points() + (removedCellCount * b.Multiplier)
 
 	if completionCount == 0 {
 		b.Multiplier = 1

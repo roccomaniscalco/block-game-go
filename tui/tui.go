@@ -70,8 +70,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 
-			m.board.Evaluate()
-
 			m.pieces = util.Remove(m.pieces, m.pieceI)
 			if len(m.pieces) == 0 {
 				m.pieces = []piece.Piece{piece.RandomPiece(), piece.RandomPiece(), piece.RandomPiece()}
