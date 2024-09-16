@@ -62,6 +62,9 @@ func (b *Board) PlacePiece(piece piece.Piece, start Cell) error {
 	return nil
 }
 
+// Evaluate the board for completed rows, columns, and squares.
+// Update the score and streak accordingly.
+// Remove the completed cells from the board.
 func (b *Board) evaluate(piece piece.Piece) {
 	completedCells := []Cell{}
 	completionCount := 0
