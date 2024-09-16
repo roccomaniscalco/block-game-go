@@ -74,7 +74,7 @@ func (b *Board) evaluate(piece piece.Piece) {
 
 	removedCellCount := b.removeCells(completedCells)
 
-	b.Score += piece.Points() + (removedCellCount * b.Multiplier)
+	b.Score += ((piece.Points() + removedCellCount) * b.Multiplier)
 
 	if completionCount == 0 {
 		b.Multiplier = 1
