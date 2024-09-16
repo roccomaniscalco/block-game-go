@@ -1,6 +1,7 @@
 package board
 
 import (
+	"block-game-go/piece"
 	"errors"
 )
 
@@ -30,28 +31,28 @@ func NewBoard() Board {
 	return board
 }
 
-func (b *Board) PlacePattern(pattern [][]bool, start Cell) error {
+func (b *Board) PlacePiece(piece piece.Piece, start Cell) error {
 	rowStart, colStart := start.RowI, start.ColI
 
 	if colStart < 0 || rowStart < 0 || colStart > 8 || rowStart > 8 {
 		return errors.New("position must be within range 0-8 inclusive")
 	}
 
-	for rowI := range pattern {
-		for colI := range pattern[rowI] {
+	for rowI := range piece.Grid {
+		for colI := range piece.Grid[rowI] {
 			if rowStart+rowI >= len(b.Grid) || colStart+colI >= len(b.Grid[rowI]) {
-				return errors.New("pattern goes out of bounds")
+				return errors.New("piece goes out of bounds")
 			}
-			if pattern[rowI][colI] && b.Grid[rowStart+rowI][colStart+colI] {
-				return errors.New("pattern overlaps filled game board tiles")
+			if piece.Grid[rowI][colI] && b.Grid[rowStart+rowI][colStart+colI] {
+				return errors.New("piece overlaps filled game board tiles")
 			}
 		}
 	}
 
-	for rowI := range pattern {
-		for colI := range pattern[rowI] {
-			if pattern[rowI][colI] {
-				b.Grid[rowStart+rowI][colStart+colI] = pattern[rowI][colI]
+	for rowI := range piece.Grid {
+		for colI := range piece.Grid[rowI] {
+			if piece.Grid[rowI][colI] {
+				b.Grid[rowStart+rowI][colStart+colI] = piece.Grid[rowI][colI]
 			}
 		}
 	}

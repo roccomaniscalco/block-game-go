@@ -65,7 +65,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// piece placement
 		case "enter", " ":
-			err := m.board.PlacePattern(m.pieces[m.pieceI].Grid, m.boardPos)
+			err := m.board.PlacePiece(m.pieces[m.pieceI], m.boardPos)
 			if err != nil {
 				return m, nil
 			}
