@@ -6,9 +6,9 @@ import (
 )
 
 type Board struct {
-	Grid       [9][9]bool
-	Score      int
-	Multiplier int
+	Grid   [9][9]bool
+	Score  int
+	Streak int
 }
 
 type Cell struct {
@@ -18,8 +18,8 @@ type Cell struct {
 
 func NewBoard() Board {
 	board := Board{
-		Score:      0,
-		Multiplier: 1,
+		Score:  0,
+		Streak: 0,
 	}
 
 	for rowI := range board.Grid {
@@ -72,15 +72,22 @@ func (b *Board) evaluate(piece piece.Piece) {
 		completionCount += len(cells) / 9
 	}
 
-	removedCellCount := b.removeCells(completedCells)
-
-	b.Score += ((piece.Points() + removedCellCount) * b.Multiplier)
-
-	if completionCount == 0 {
-		b.Multiplier = 1
-	} else {
-		b.Multiplier += completionCount
+	// Update score
+	completionBonus := len(completedCells) * 2
+	if completionCount > 1 {
+		completionBonus += (completionCount - 1) * 10
 	}
+	streakBonus := b.Streak * 10
+	b.Score += piece.Points() + completionBonus + streakBonus
+
+	// Update streak
+	if completionCount > 0 {
+		b.Streak += 1
+	} else {
+		b.Streak = 0
+	}
+
+	b.removeCells(completedCells)
 }
 
 func (b *Board) evaluateRows() []Cell {
@@ -162,4 +169,11 @@ func (b *Board) removeCells(cells []Cell) int {
 	}
 
 	return uniqueCellCount
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }

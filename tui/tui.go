@@ -171,7 +171,7 @@ func isLight(cell board.Cell) bool {
 }
 
 func (m model) scoreUI() string {
-	return fmt.Sprintf("Score: %d\nMultiplier: %d", m.board.Score, m.board.Multiplier)
+	return fmt.Sprintf("Score: %d\nStreak: %d", m.board.Score, m.board.Streak)
 }
 
 func Play() {
