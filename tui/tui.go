@@ -3,9 +3,9 @@ package tui
 import (
 	"block-game-go/board"
 	"block-game-go/piece"
-	"block-game-go/util"
 	"fmt"
 	"os"
+	"slices"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -54,14 +54,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.pieceI = 2
 
 		// piece movement
-		case "left":
-			m.boardPos.ColI--
-		case "right":
-			m.boardPos.ColI++
-		case "up":
+		case "w", "up":
 			m.boardPos.RowI--
-		case "down":
+		case "a", "left":
+			m.boardPos.ColI--
+		case "s", "down":
 			m.boardPos.RowI++
+		case "d", "right":
+			m.boardPos.ColI++
 
 		// piece placement
 		case "enter", " ":
@@ -70,7 +70,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 
-			m.pieces = util.Remove(m.pieces, m.pieceI)
+			m.pieces = slices.Delete(m.pieces, m.pieceI, m.pieceI+1)
 			if len(m.pieces) == 0 {
 				m.pieces = []piece.Piece{piece.RandomPiece(), piece.RandomPiece(), piece.RandomPiece()}
 			}
