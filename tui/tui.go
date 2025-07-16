@@ -1,4 +1,4 @@
-package cli
+package tui
 
 import (
 	"block-game-go/board"

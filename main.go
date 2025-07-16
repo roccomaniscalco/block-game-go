@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	cli.Play()
+	tui.Play()
 }
