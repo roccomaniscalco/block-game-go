@@ -31,6 +31,10 @@ func NewBoard() Board {
 	return board
 }
 
+func (b *Board) IsGameOver(pieces []piece.Piece) bool {
+	return false
+}
+
 func (b *Board) PlacePiece(piece piece.Piece, start Cell) error {
 	rowStart, colStart := start.RowI, start.ColI
 

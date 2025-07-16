@@ -14,7 +14,7 @@ import (
 var styles = struct {
 	border lipgloss.Style
 }{
-	border: lipgloss.NewStyle().Border(lipgloss.RoundedBorder(), true, true, true, true),
+	border: lipgloss.NewStyle().Border(lipgloss.RoundedBorder(), true),
 }
 
 type model struct {
@@ -100,7 +100,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return lipgloss.JoinHorizontal(lipgloss.Top, m.piecesUI(), m.boardUI(), m.scoreUI())
+	return lipgloss.JoinHorizontal(lipgloss.Top, m.piecesUI(),
+		lipgloss.JoinVertical(lipgloss.Top, m.scoreUI(), m.boardUI()))
 }
 
 func (m model) piecesUI() string {
@@ -116,7 +117,12 @@ func (m model) piecesUI() string {
 		pieces = append(pieces, piece)
 	}
 
-	return styles.border.Width(11).Height(18).AlignHorizontal(lipgloss.Center).Render(lipgloss.JoinVertical(lipgloss.Center, pieces...))
+	return styles.border.
+		Width(11).
+		Height(17).
+		AlignHorizontal(lipgloss.Center).
+		MarginRight(1).
+		Render(lipgloss.JoinVertical(lipgloss.Center, pieces...))
 }
 
 func (m model) boardUI() string {
@@ -171,7 +177,7 @@ func isLight(cell board.Cell) bool {
 }
 
 func (m model) scoreUI() string {
-	return fmt.Sprintf("Score: %d\nStreak: %d", m.board.Score, m.board.Streak)
+	return styles.border.Width(18).Render(fmt.Sprintf("Score: %d\nStreak: %d", m.board.Score, m.board.Streak))
 }
 
 func Play() {
