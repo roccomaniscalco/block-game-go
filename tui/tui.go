@@ -105,16 +105,16 @@ func (m model) View() string {
 }
 
 func (m model) piecesUI() string {
-	pieces := []string{}
+	pieceStrs := []string{}
 
-	for i, choice := range m.pieces {
-		piece := ""
+	for i, piece := range m.pieces {
+		pieceStr := ""
 		if i == m.pieceI {
-			piece = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF00FF")).Render(choice.ToString())
+			pieceStr = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF00FF")).Render(piece.ToString())
 		} else {
-			piece = lipgloss.NewStyle().Render(choice.ToString())
+			pieceStr = lipgloss.NewStyle().Render(piece.ToString())
 		}
-		pieces = append(pieces, piece)
+		pieceStrs = append(pieceStrs, pieceStr)
 	}
 
 	return styles.border.
@@ -122,58 +122,52 @@ func (m model) piecesUI() string {
 		Height(17).
 		AlignHorizontal(lipgloss.Center).
 		MarginRight(1).
-		Render(lipgloss.JoinVertical(lipgloss.Center, pieces...))
+		Render(lipgloss.JoinVertical(lipgloss.Center, pieceStrs...))
 }
 
 func (m model) boardUI() string {
 	selectedPiece := m.pieces[m.pieceI]
-	str := ""
+	boardStr := ""
 
-	adjSelectedPiece := [9][9]bool{}
+	// selected piece adjusted to its position on the board
+	selectedPieceOverlay := [9][9]bool{}
 	for rowI := range selectedPiece.Grid {
 		for colI := range selectedPiece.Grid[rowI] {
 			if selectedPiece.Grid[rowI][colI] {
-				adjSelectedPiece[rowI+m.boardPos.RowI][colI+m.boardPos.ColI] = selectedPiece.Grid[rowI][colI]
+				selectedPieceOverlay[rowI+m.boardPos.RowI][colI+m.boardPos.ColI] = selectedPiece.Grid[rowI][colI]
 			}
 		}
 	}
 
 	for rowI := range m.board.Grid {
 		for colI := range m.board.Grid[rowI] {
-			cell := m.board.Grid[rowI][colI]
-			selectedPieceCell := adjSelectedPiece[rowI][colI]
-
-			isLightCell := isLight(board.Cell{RowI: rowI, ColI: colI})
+			isCellFilled := m.board.Grid[rowI][colI]
+			isCellInOddSquare := (rowI/3%2 == 1) != (colI/3%2 == 1)
+			isCellSelected := selectedPieceOverlay[rowI][colI]
 
 			var cellStr string
 			switch {
-			case cell:
+			case isCellFilled:
 				cellStr = "▓▓"
-			case isLightCell:
+			case isCellInOddSquare:
 				cellStr = "░░"
 			default:
 				cellStr = "▒▒"
 			}
 
-			if selectedPieceCell {
+			if isCellSelected {
 				cellStr = lipgloss.NewStyle().Background(lipgloss.Color("#FF00FF")).Render(cellStr)
 			}
 
-			str += cellStr
+			boardStr += cellStr
 		}
 
 		if rowI < len(m.board.Grid)-1 {
-			str += "\n"
+			boardStr += "\n"
 		}
 	}
 
-	return styles.border.MarginRight(1).Render(str)
-}
-
-func isLight(cell board.Cell) bool {
-	isInOddRow := cell.RowI/3%2 == 1
-	isInOddCol := cell.ColI/3%2 == 1
-	return isInOddRow != isInOddCol
+	return styles.border.MarginRight(1).Render(boardStr)
 }
 
 func (m model) scoreUI() string {
