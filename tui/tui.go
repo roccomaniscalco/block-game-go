@@ -8,13 +8,13 @@ import (
 	"slices"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	gloss "github.com/charmbracelet/lipgloss"
 )
 
 var styles = struct {
-	border lipgloss.Style
+	border gloss.Style
 }{
-	border: lipgloss.NewStyle().Border(lipgloss.RoundedBorder(), true),
+	border: gloss.NewStyle().Border(gloss.RoundedBorder(), true),
 }
 
 type model struct {
@@ -110,8 +110,8 @@ func (m model) ensureBoardPositionWithinBounds() model {
 }
 
 func (m model) View() string {
-	return lipgloss.JoinHorizontal(lipgloss.Top, m.piecesUI(),
-		lipgloss.JoinVertical(lipgloss.Top, m.scoreUI(), m.boardUI()))
+	return gloss.JoinHorizontal(gloss.Top, m.piecesUI(),
+		gloss.JoinVertical(gloss.Top, m.scoreUI(), m.boardUI()))
 }
 
 func (m model) piecesUI() string {
@@ -120,9 +120,9 @@ func (m model) piecesUI() string {
 	for i, piece := range m.pieces {
 		pieceStr := ""
 		if i == m.pieceI {
-			pieceStr = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF00FF")).Render(piece.ToString())
+			pieceStr = gloss.NewStyle().Foreground(gloss.Color("#FF00FF")).Render(piece.ToString())
 		} else {
-			pieceStr = lipgloss.NewStyle().Render(piece.ToString())
+			pieceStr = gloss.NewStyle().Render(piece.ToString())
 		}
 		pieceStrs = append(pieceStrs, pieceStr)
 	}
@@ -130,9 +130,9 @@ func (m model) piecesUI() string {
 	return styles.border.
 		Width(11).
 		Height(17).
-		AlignHorizontal(lipgloss.Center).
+		AlignHorizontal(gloss.Center).
 		MarginRight(1).
-		Render(lipgloss.JoinVertical(lipgloss.Center, pieceStrs...))
+		Render(gloss.JoinVertical(gloss.Center, pieceStrs...))
 }
 
 func (m model) boardUI() string {
@@ -166,7 +166,7 @@ func (m model) boardUI() string {
 			}
 
 			if isCellSelected {
-				cellStr = lipgloss.NewStyle().Background(lipgloss.Color("#FF00FF")).Render(cellStr)
+				cellStr = gloss.NewStyle().Background(gloss.Color("#FF00FF")).Render(cellStr)
 			}
 
 			boardStr += cellStr
