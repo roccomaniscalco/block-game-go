@@ -32,31 +32,47 @@ func NewBoard() Board {
 }
 
 func (b *Board) IsGameOver(pieces []piece.Piece) bool {
-	return false
+	for _, piece := range pieces {
+		for rowI := range b.Grid {
+			for colI := range b.Grid[rowI] {
+				if err := b.canPlacePiece(piece, Cell{RowI: rowI, ColI: colI}); err == nil {
+					return false
+				}
+			}
+		}
+	}
+
+	return true
 }
 
-func (b *Board) PlacePiece(piece piece.Piece, start Cell) error {
-	rowStart, colStart := start.RowI, start.ColI
-
-	if colStart < 0 || rowStart < 0 || colStart > 8 || rowStart > 8 {
-		return errors.New("position must be within range 0-8 inclusive")
+func (b *Board) canPlacePiece(piece piece.Piece, start Cell) error {
+	if start.ColI < 0 || start.RowI < 0 || start.ColI > 8 || start.RowI > 8 {
+		return errors.New("start position must be within range 0-8 inclusive")
 	}
 
 	for rowI := range piece.Grid {
 		for colI := range piece.Grid[rowI] {
-			if rowStart+rowI >= len(b.Grid) || colStart+colI >= len(b.Grid[rowI]) {
+			if start.RowI+rowI >= len(b.Grid) || start.ColI+colI >= len(b.Grid[rowI]) {
 				return errors.New("piece goes out of bounds")
 			}
-			if piece.Grid[rowI][colI] && b.Grid[rowStart+rowI][colStart+colI] {
-				return errors.New("piece overlaps filled game board tiles")
+			if piece.Grid[rowI][colI] && b.Grid[start.RowI+rowI][start.ColI+colI] {
+				return errors.New("piece overlaps filled game board cells")
 			}
 		}
+	}
+
+	return nil
+}
+
+func (b *Board) PlacePiece(piece piece.Piece, start Cell) error {
+	if err := b.canPlacePiece(piece, start); err != nil {
+		return err
 	}
 
 	for rowI := range piece.Grid {
 		for colI := range piece.Grid[rowI] {
 			if piece.Grid[rowI][colI] {
-				b.Grid[rowStart+rowI][colStart+colI] = piece.Grid[rowI][colI]
+				b.Grid[start.RowI+rowI][start.ColI+colI] = piece.Grid[rowI][colI]
 			}
 		}
 	}

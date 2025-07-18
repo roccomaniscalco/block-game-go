@@ -65,8 +65,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// piece placement
 		case "enter", " ":
-			err := m.board.PlacePiece(m.pieces[m.pieceI], m.boardPos)
-			if err != nil {
+			if err := m.board.PlacePiece(m.pieces[m.pieceI], m.boardPos); err != nil {
 				return m, nil
 			}
 
@@ -77,12 +76,24 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	// handle out of bounds of pieces
+	m = m.ensurePieceIndexWithinBounds()
+	m = m.ensureBoardPositionWithinBounds()
+
+	if m.board.IsGameOver(m.pieces) {
+		return m, tea.Quit
+	}
+
+	return m, nil
+}
+
+func (m model) ensurePieceIndexWithinBounds() model {
 	if m.pieceI >= len(m.pieces) {
 		m.pieceI = len(m.pieces) - 1
 	}
+	return m
+}
 
-	// handle out of bounds of board
+func (m model) ensureBoardPositionWithinBounds() model {
 	if m.boardPos.ColI < 0 {
 		m.boardPos.ColI = 9 - m.pieces[m.pieceI].Width()
 	}
@@ -95,8 +106,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.boardPos.RowI+m.pieces[m.pieceI].Height() > 9 {
 		m.boardPos.RowI = 0
 	}
-
-	return m, nil
+	return m
 }
 
 func (m model) View() string {
