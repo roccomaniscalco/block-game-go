@@ -69,7 +69,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 
+			m.board.Evaluate(m.pieces[m.pieceI])
+
 			m.pieces = slices.Delete(m.pieces, m.pieceI, m.pieceI+1)
+
 			if len(m.pieces) == 0 {
 				m.pieces = []piece.Piece{piece.RandomPiece(), piece.RandomPiece(), piece.RandomPiece()}
 			}
