@@ -1,4 +1,4 @@
-package piece
+package game
 
 import (
 	"math/rand"

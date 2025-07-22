@@ -1,35 +1,34 @@
 package agent
 
 import (
-	"block-game-go/board"
-	"block-game-go/piece"
+	"block-game-go/game"
 	"fmt"
 	"slices"
 )
 
-type state struct {
-	board  board.Board
-	pieces []piece.Piece
+type model struct {
+	board  game.Board
+	pieces []game.Piece
 }
 
-func (s *state) PlacePiece(pieceI int, rowI int, colI int) error {
-	if pieceI < 0 || pieceI >= len(s.pieces) {
+func (m *model) PlacePiece(pieceI int, rowI int, colI int) error {
+	if pieceI < 0 || pieceI >= len(m.pieces) {
 		return fmt.Errorf("piece index out of bounds: %d", pieceI)
 	}
 
-	p := s.pieces[pieceI]
-	c := board.Cell{RowI: rowI, ColI: colI}
+	piece := m.pieces[pieceI]
+	cell := game.Cell{RowI: rowI, ColI: colI}
 
-	if err := s.board.PlacePiece(p, c); err != nil {
+	if err := m.board.PlacePiece(piece, cell); err != nil {
 		return err
 	}
 
-	s.board.Evaluate(p)
+	m.board.Evaluate(piece)
 
-	s.pieces = slices.Delete(s.pieces, pieceI, pieceI+1)
+	m.pieces = slices.Delete(m.pieces, pieceI, pieceI+1)
 
-	if len(s.pieces) == 0 {
-		s.pieces = []piece.Piece{piece.RandomPiece(), piece.RandomPiece(), piece.RandomPiece()}
+	if len(m.pieces) == 0 {
+		m.pieces = []game.Piece{game.RandomPiece(), game.RandomPiece(), game.RandomPiece()}
 	}
 
 	return nil

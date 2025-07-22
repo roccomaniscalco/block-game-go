@@ -1,8 +1,7 @@
 package tui
 
 import (
-	"block-game-go/board"
-	"block-game-go/piece"
+	"block-game-go/game"
 	"fmt"
 	"os"
 	"slices"
@@ -18,17 +17,17 @@ var styles = struct {
 }
 
 type model struct {
-	board    board.Board
-	boardPos board.Cell
-	pieces   []piece.Piece
+	board    game.Board
+	boardPos game.Cell
+	pieces   []game.Piece
 	pieceI   int
 }
 
 func initialModel() model {
 	return model{
-		board:    board.NewBoard(),
-		boardPos: board.Cell{RowI: 0, ColI: 0},
-		pieces:   []piece.Piece{piece.RandomPiece(), piece.RandomPiece(), piece.RandomPiece()},
+		board:    game.NewBoard(),
+		boardPos: game.Cell{RowI: 0, ColI: 0},
+		pieces:   []game.Piece{game.RandomPiece(), game.RandomPiece(), game.RandomPiece()},
 		pieceI:   0,
 	}
 }
@@ -74,7 +73,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.pieces = slices.Delete(m.pieces, m.pieceI, m.pieceI+1)
 
 			if len(m.pieces) == 0 {
-				m.pieces = []piece.Piece{piece.RandomPiece(), piece.RandomPiece(), piece.RandomPiece()}
+				m.pieces = []game.Piece{game.RandomPiece(), game.RandomPiece(), game.RandomPiece()}
 			}
 		}
 	}

@@ -1,7 +1,6 @@
-package board
+package game
 
 import (
-	"block-game-go/piece"
 	"errors"
 )
 
@@ -31,7 +30,7 @@ func NewBoard() Board {
 	return board
 }
 
-func (b *Board) IsGameOver(pieces []piece.Piece) bool {
+func (b *Board) IsGameOver(pieces []Piece) bool {
 	for _, piece := range pieces {
 		for rowI := range b.Grid {
 			for colI := range b.Grid[rowI] {
@@ -45,7 +44,7 @@ func (b *Board) IsGameOver(pieces []piece.Piece) bool {
 	return true
 }
 
-func (b *Board) canPlacePiece(piece piece.Piece, start Cell) error {
+func (b *Board) canPlacePiece(piece Piece, start Cell) error {
 	if start.ColI < 0 || start.RowI < 0 || start.ColI > 8 || start.RowI > 8 {
 		return errors.New("start position must be within range 0-8 inclusive")
 	}
@@ -64,7 +63,7 @@ func (b *Board) canPlacePiece(piece piece.Piece, start Cell) error {
 	return nil
 }
 
-func (b *Board) PlacePiece(piece piece.Piece, start Cell) error {
+func (b *Board) PlacePiece(piece Piece, start Cell) error {
 	if err := b.canPlacePiece(piece, start); err != nil {
 		return err
 	}
@@ -83,7 +82,7 @@ func (b *Board) PlacePiece(piece piece.Piece, start Cell) error {
 // Evaluate the board for completed rows, columns, and squares.
 // Update the score and streak accordingly.
 // Remove the completed cells from the board.
-func (b *Board) Evaluate(piece piece.Piece) {
+func (b *Board) Evaluate(piece Piece) {
 	completedCells := []Cell{}
 	completionCount := 0
 
