@@ -4,7 +4,6 @@ import (
 	"block-game-go/game"
 	"fmt"
 	"os"
-	"slices"
 
 	tea "github.com/charmbracelet/bubbletea"
 	gloss "github.com/charmbracelet/lipgloss"
@@ -19,7 +18,7 @@ var styles = struct {
 type model struct {
 	board    game.Board
 	boardPos game.Cell
-	pieces   []game.Piece
+	pieces   game.Pieces
 	pieceI   int
 }
 
@@ -27,7 +26,7 @@ func initialModel() model {
 	return model{
 		board:    game.NewBoard(),
 		boardPos: game.Cell{RowI: 0, ColI: 0},
-		pieces:   []game.Piece{game.RandomPiece(), game.RandomPiece(), game.RandomPiece()},
+		pieces:   game.NewPieces(),
 		pieceI:   0,
 	}
 }
@@ -67,14 +66,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if err := m.board.PlacePiece(m.pieces[m.pieceI], m.boardPos); err != nil {
 				return m, nil
 			}
-
 			m.board.Evaluate(m.pieces[m.pieceI])
-
-			m.pieces = slices.Delete(m.pieces, m.pieceI, m.pieceI+1)
-
-			if len(m.pieces) == 0 {
-				m.pieces = []game.Piece{game.RandomPiece(), game.RandomPiece(), game.RandomPiece()}
-			}
+			m.pieces.Use(m.pieceI)
 		}
 	}
 

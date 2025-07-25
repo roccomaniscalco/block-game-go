@@ -2,7 +2,21 @@ package game
 
 import (
 	"math/rand"
+	"slices"
 )
+
+type Pieces []Piece
+
+func NewPieces() Pieces {
+	return Pieces{RandomPiece(), RandomPiece(), RandomPiece()}
+}
+
+func (p *Pieces) Use(index int) {
+	*p = slices.Delete(*p, index, index+1)
+	if len(*p) == 0 {
+		*p = NewPieces()
+	}
+}
 
 type Piece struct {
 	Grid [][]bool
